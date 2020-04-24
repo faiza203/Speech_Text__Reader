@@ -1,67 +1,106 @@
-const main = document.getElementById("main");
-const voices = document.getElementById("voices");
-const textarea = document.getElementById("text");
-const readButton = document.getElementById("read");
-const toggleButton = document.getElementById("toggle");
-const closeButton = document.getElementById("close");
+const main = document.querySelector('main');
+const voicesSelect = document.getElementById('voices');
+const textarea = document.getElementById('text');
+const readBtn = document.getElementById('read');
+const toggleBtn = document.getElementById('toggle');
+const closeBtn = document.getElementById('close');
 const data = [
   {
-    image: "./img/drink.png",
-    text: "I'm thirsty",
+    image: './img/drink.png',
+    text: "I'm Thirsty"
   },
   {
-    image: "./img/angry.png",
-    text: "I'm angry",
+    image: './img/food.png',
+    text: "I'm Hungry"
   },
   {
-    image: "./img/food.png",
-    text: "I'm hungry",
+    image: './img/tired.png',
+    text: "I'm Tired"
   },
   {
-    image: "./img/grandma.png",
-    text: "I love grandma",
+    image: './img/hurt.png',
+    text: "I'm Hurt"
   },
   {
-    image: "./img/happy.png",
-    text: "I'm happy",
+    image: './img/happy.png',
+    text: "I'm Happy"
   },
   {
-    image: "./img/home.png",
-    text: "I am in the home",
+    image: './img/angry.png',
+    text: "I'm Angry"
   },
   {
-    image: "./img/hurt.png",
-    text: "I'm hurt",
+    image: './img/sad.png',
+    text: "I'm Sad"
   },
   {
-    image: "./img/outside.png",
-    text: "I'm went to outside",
+    image: './img/scared.png',
+    text: "I'm Scared"
   },
   {
-    image: "./img/sad.png",
-    text: "I'm sad",
+    image: './img/outside.png',
+    text: 'I Want To Go Outside'
   },
   {
-    image: "./img/scared.png",
-    text: "I'm scared",
+    image: './img/home.png',
+    text: 'I Want To Go Home'
   },
   {
-    image: "./img/school.png",
-    text: "I'm went to school",
+    image: './img/school.png',
+    text: 'I Want To Go To School'
   },
   {
-    image: "./img/tired.png",
-    text: "I'm tired",
-  },
+    image: './img/grandma.png',
+    text: 'I Want To Go To Grandmas'
+  }
 ];
 data.forEach(createBox);
 function createBox(item) {
-  const box = document.createElement("div");
+  const box = document.createElement('div');
   const { image, text } = item;
-  box.classList.add("box");
+  box.classList.add('box');
   box.innerHTML = `
-  <img src="${image}"></img>
-  <p class="info">${text}</p>
+    <img src="${image}" alt="${text}" />
+    <p class="info">${text}</p>
   `;
-  document.querySelector("main").appendChild(box);
+  box.addEventListener('click', () => {
+    setTextMessage(text);
+    speakText();
+    box.classList.add('active');
+    setTimeout(() => box.classList.remove('active'), 800);
+  });
+  main.appendChild(box);
 }
+const message = new SpeechSynthesisUtterance();
+let voices = [];
+function getVoices() {
+  voices = speechSynthesis.getVoices();
+  voices.forEach(voice => {
+    const option = document.createElement('option');
+    option.value = voice.name;
+    option.innerText = `${voice.name} ${voice.lang}`;
+    voicesSelect.appendChild(option);
+  });
+}
+function setTextMessage(text) {
+  message.text = text;
+}
+function speakText() {
+  speechSynthesis.speak(message);
+}
+function setVoice(e) {
+  message.voice = voices.find(voice => voice.name === e.target.value);
+}
+speechSynthesis.addEventListener('voiceschanged', getVoices);
+toggleBtn.addEventListener('click', () =>
+  document.getElementById('text-box').classList.toggle('show')
+);
+closeBtn.addEventListener('click', () =>
+  document.getElementById('text-box').classList.remove('show')
+);
+voicesSelect.addEventListener('change', setVoice);
+readBtn.addEventListener('click', () => {
+  setTextMessage(textarea.value);
+  speakText();
+});
+getVoices();
